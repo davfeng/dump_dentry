@@ -1,0 +1,12 @@
+#!/bin/sh
+module="dump_inodes"
+mode="664"
+
+# get the super_blocks and sb_lock from /proc/kallsyms
+sb_lock=`sudo cat /proc/kallsyms | grep "sb_lock$" | awk '{print $1}'`
+super_blocks=`sudo cat /proc/kallsyms | grep "super_blocks$" | awk '{print $1}'`
+echo "sb_lock=0x$sb_lock, super_blocks=0x$super_blocks"
+# invoke insmod with all arguments we got
+# and use a pathname, as newer modutils don't look in . by default
+/sbin/insmod ./$module.ko super_blocks=0x$super_blocks sb_lock=0x$sb_lock $* || exit 1
+
